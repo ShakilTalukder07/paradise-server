@@ -22,6 +22,14 @@ async function run(){
     try {
         
         const serviceCollection = client.db('paradise').collection('services')
+        const limitedServiceCollection = client.db('paradise').collection('limitedServices')
+
+        app.get('/limitedServices', async(req, res)=>{
+            const query = {}
+            const cursor = limitedServiceCollection.find(query)
+            const limitedServices = await cursor.limit(3).toArray();
+            res.send(limitedServices);
+        });
 
         app.get('/services', async(req, res)=>{
             const query = {}
@@ -36,6 +44,12 @@ async function run(){
             const service = await serviceCollection.findOne(query)
             res.send(service);
         });
+
+        app.post('/services', async(req, res)=>{
+            const totalServices = req.body;
+            const result = await serviceCollection.insertOne(totalServices)
+            res.send(result);
+        })
 
     } 
     finally {
