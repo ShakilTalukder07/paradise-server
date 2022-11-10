@@ -23,6 +23,7 @@ async function run(){
         
         const serviceCollection = client.db('paradise').collection('services')
         const limitedServiceCollection = client.db('paradise').collection('limitedServices')
+        const reviewsCollection = client.db('paradise').collection('totalReviews')
 
         app.get('/limitedServices', async(req, res)=>{
             const query = {}
@@ -49,6 +50,33 @@ async function run(){
             const totalServices = req.body;
             const result = await serviceCollection.insertOne(totalServices)
             res.send(result);
+        });
+
+        // post and get reviews 
+
+        app.post('/totalReviews', async(req, res)=>{
+            const totalReviews = req.body;
+            const review = await reviewsCollection.insertOne(totalReviews)
+            res.send(review)
+        });
+
+        app.get('/totalReviews', async(req, res)=>{
+            let query ={}
+            if(req.query.email){
+                query = {
+                    email: req.query.email
+                }
+            }
+            const cursor = reviewsCollection.find(query)
+            const review = await cursor.toArray()
+            res.send(review);
+        });
+
+        app.delete('totalReviews/:id', async(req, res)=>{
+            const id = req.params.id;
+            const query = {_id : ObjectId(id) };
+            const result = await reviewsCollection.deleteOne(query);
+            res.send(result); 
         })
 
     } 
